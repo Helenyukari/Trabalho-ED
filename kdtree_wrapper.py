@@ -27,7 +27,7 @@ class Tarv(Structure):
         ("k", c_int)
     ]
 
-# Carrega a biblioteca compilada 
+# Carrega a biblioteca compilada no windows dll
 try:
     lib = ctypes.CDLL("./kdtreee.dll") 
 except OSError as e:

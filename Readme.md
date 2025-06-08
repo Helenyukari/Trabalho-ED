@@ -4,11 +4,37 @@ O objetivo é desenvolver um sistema de reconhecimento facial utilizando uma bas
 
 <img title="a title" alt="Alt text" src="mapaMental.png">
 
+## ✨ Funcionalidades
+
+- ✅ Inserção de embeddings (float[128] + ID) na KD-Tree
+- ✅ Busca do vizinho mais próximo
+- 🔄 Busca dos **N vizinhos mais próximos** usando Heap
+- 🔄 Implementação própria de Heap (Max Heap)
+- ✅Geração de embeddings com **Deepface** ou link do professor do colab
+- ✅ Exportação de embeddings em `.json`
+- ✅ Suporte para integração com API (em desenvolvimento)
+
+
+## 📂 Estrutura do Projeto
+
+```
+📁 Trabalho-ED/
+├── kdtreee.c              # Código principal com KDTree 
+├──kdtree_wrapper.py       #compila o codigo c pra py
+├──app.py                 #geração dos endpoints da api
+├──heap.c              # Implementação da Heap
+├── heap.h/.c          # Implementação da Heap
+├── embeddings.json        # Arquivo de saída com os embeddings gerados
+├──  kdtreee.dll # # Carrega a biblioteca compilada no windows dll     
+└── facenet_embedding.ipynb     # Script para gerar os embeddings a partir do LFW no deepface
+├── requeriments.txt      #comandos para a execução
+```
 ## 🎯 Parte 1: Refatoração do Código da KD-Tree
 
 O código base fornecido (originalmente para dados de latitude e longitude) precisa ser refatorado para:
 
-#### 1. Incorporar Heap para Busca dos N Vizinhos Mais Próximos
+#### (🛠️Em desenvolvimento)
+ 1. Incorporar Heap para Busca dos N Vizinhos Mais Próximos
    - **Objetivo:** Modificar o algoritmo de busca da KD-Tree para retornar os **N** vizinhos mais próximos de um ponto de consulta.
    - **Técnica:** Utilizar um **heap** (max-heap de tamanho N) para manter eficientemente os N candidatos mais próximos encontrados durante a varredura da árvore.
    - **Lógica:**
@@ -17,7 +43,8 @@ O código base fornecido (originalmente para dados de latitude e longitude) prec
      - Se o heap estiver cheio e o ponto atual for mais próximo que o mais distante no heap, remover o mais distante e adicionar o atual.
      - Otimizar a poda da árvore usando o raio da k-ésima distância atual no heap.
 
-#### 2. Alterar a Estrutura de Dados
+#### (✅Desenvolvido)
+  2. Alterar a Estrutura de Dados
    - **Objetivo:** Adaptar a estrutura de dados da KD-Tree para armazenar informações de faces.
    - **Novos Campos:**
      - **Embedding da Face:** Um vetor de **128 floats**.
@@ -33,8 +60,8 @@ O código base fornecido (originalmente para dados de latitude e longitude) prec
 ## 🎯 Parte 2: Aplicação e Teste da API
 
 Com a KD-Tree modificada e sua API funcionando:
-
-#### 1. Armazenar 1000 Faces
+(✅Desenvolvido)
+#### 1. Armazenar 1000 Faces (✅Desenvolvido)
    - **Fonte dos Embeddings:** Utilizar o código fornecido no Colab ([link](https://colab.research.google.com/drive/1Xq-H-Agj6o1paiA6SAKSeoDeX3kRj739?usp=sharing)) para gerar os embeddings de 128 dimensões a partir de imagens.
    - **Dataset:** Utilizar imagens do dataset **LFW (Labeled Faces in the Wild)**, além de imagens da **sua face** e de **mais duas pessoas conhecidas**.
    - **Processo:**
@@ -43,7 +70,7 @@ Com a KD-Tree modificada e sua API funcionando:
      3. Criar um ID para cada face.
      4. Usar a API da KD-Tree para inserir cada par (embedding, ID) na árvore, totalizando 1000 faces.
 
-#### 2. Verificar os 5 Vizinhos Mais Próximos
+#### 2. Verificar os 5 Vizinhos Mais Próximos (🛠️Em desenvolvimento)
    - **Objetivo:** Testar a precisão da busca k-NN.
    - **Processo:**
      1. Gerar os embeddings para a sua face e para as faces das duas pessoas conhecidas (que já estão na árvore).
@@ -51,6 +78,11 @@ Com a KD-Tree modificada e sua API funcionando:
      3. Verificar se o ID correto (seu ou da pessoa conhecida) está presente na lista dos 5 vizinhos retornados pela API.
 
 ---
+### ❔ Como executar  👩‍💻:
+ Os comandos necessarios para executar o projeto estão presentes no arquivo requeriments.txt e o arquivo do colab com o codigo de geração de embeddings em .json a partir de fotos.
+ 
+---
+
 
 ##   Entrega
 
@@ -58,3 +90,5 @@ Com a KD-Tree modificada e sua API funcionando:
 - **Parte 2:**
     - Link para o código no GitHub contendo a solução da Parte 2 (uso da API, armazenamento e teste).
     - Vídeo de aproximadamente 5 minutos explicando as principais alterações no código e demonstrando o sistema em funcionamento.
+
+

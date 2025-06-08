@@ -1,3 +1,4 @@
+#app
 from fastapi import FastAPI, Query
 from typing import List
 from kdtree_wrapper import lib, Tarv, TReg

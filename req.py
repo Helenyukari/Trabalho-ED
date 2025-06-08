@@ -1,6 +1,7 @@
 import requests
 import json
 
+#arquivo teste
 BASE_URL = "http://localhost:8000"
 JSON_FILE = "embeddings.json"
 
@@ -30,10 +31,10 @@ if __name__ == "__main__":
     construir_arvore()
 
     # 2. Insere os 3 primeiros pontos para teste rápido
-    for p in pessoas[:3]:
+    for p in pessoas[:100]:
         inserir_um_ponto(p)
 
     # 3. Faz busca com o primeiro ponto
     print("\n[TESTE DE BUSCA]")
-    sucesso = buscar(pessoas[0])
+    sucesso = buscar(pessoas[10])
     print("🎯 Resultado:", "SUCESSO!" if sucesso else "FALHOU!")
