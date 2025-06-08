@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include "heap.h" 
 
+//Precisa ser reestruturado !em desenvolvimento
 void troca(nodeHeap *a, nodeHeap *b) {
     nodeHeap aux = *a;
     *a = *b;

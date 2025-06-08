@@ -100,7 +100,7 @@ void kdtree_destroi(tarv *arv) {
     _kdtree_destroi(arv->raiz);
 }
 
-//busca normal
+//busca mais proximo com poda
 void _kdtree_busca(tarv *arv, tnode *atual, void *key, int profund, tnode **melhor_no, double *melhor_dist) {
     if (atual == NULL) return;
 

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h> 
 
+//Precisa ser reestruturado !em desenvolvimento
 typedef struct {
     double distancia;
     void *node;
