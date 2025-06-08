@@ -1,37 +1,49 @@
 import ctypes
-from ctypes import Structure, POINTER, c_double, c_int,c_char
+from ctypes import Structure, POINTER, c_double, c_int, c_char, c_float, c_void_p
 
+# Define a estrutura TReg (embedding + nome)
 class TReg(Structure):
-    _fields_ = [("embedding", ctypes.c_float * 128),
-                ("id", ctypes.c_char * 100)]
-    
-    
+    _fields_ = [
+        ("embedding", c_float * 128),
+        ("person_id", c_char * 100)
+    ]
+
+# Define a estrutura TNode
 class TNode(Structure):
     pass
 
 TNode._fields_ = [
-    ("key", ctypes.c_void_p),
+    ("key", c_void_p),
     ("esq", POINTER(TNode)),
     ("dir", POINTER(TNode))
 ]
 
+# Define a árvore Tarv
 class Tarv(Structure):
-    _fields_ = [("k", c_int),
-                ("dist", ctypes.CFUNCTYPE(c_double, ctypes.c_void_p, ctypes.c_void_p)),
-                ("cmp", ctypes.CFUNCTYPE(c_int, ctypes.c_void_p, ctypes.c_void_p, c_int)),
-                ("raiz", POINTER(TNode))]
+    _fields_ = [
+        ("raiz", POINTER(TNode)),
+        ("cmp", c_void_p),
+        ("dist", c_void_p),
+        ("k", c_int)
+    ]
+
+# Carrega a biblioteca compilada 
+try:
+    lib = ctypes.CDLL("./kdtreee.dll") 
+except OSError as e:
+    print(f"Erro ao carregar a biblioteca: {e}")
+    exit()
 
 
-# Carregar a biblioteca C
-lib = ctypes.CDLL("./libkdtree.so")
+# Define as assinaturas das funções C que serão chamadas
+lib.kdtree_construir_global.argtypes = []
+lib.kdtree_construir_global.restype = None
 
-# Definir a assinatura da função
-lib.buscar_mais_proximo.argtypes = [POINTER(Tarv), TReg]
-lib.buscar_mais_proximo.restype = TReg
+lib.get_tree.argtypes = []
 lib.get_tree.restype = POINTER(Tarv)
+
 lib.inserir_ponto.argtypes = [TReg]
 lib.inserir_ponto.restype = None
-lib.kdtree_construir.argtypes = []
-lib.kdtree_construir.restype = None
 
-
+lib.buscar_mais_proximo.argtypes = [POINTER(Tarv), TReg]
+lib.buscar_mais_proximo.restype = TReg

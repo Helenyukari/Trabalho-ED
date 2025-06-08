@@ -3,7 +3,7 @@
 #include <float.h> 
 #include <string.h>
 #include <math.h> 
-#include "my_lib/heap.h"
+#include "heap.h"
 
 /*Definições desenvolvedor usuario*/
 #define tam_emb 128 
@@ -59,7 +59,6 @@ typedef struct _arv {
 } tarv;
 
 /*funções desenvolvedor da biblioteca*/
-
 void kdtree_constroi(tarv *arv, int (*cmp)(void *a, void *b, int), double (*dist)(void *, void *), int k) {
     arv->raiz = NULL;
     arv->cmp = cmp;
@@ -101,63 +100,102 @@ void kdtree_destroi(tarv *arv) {
     _kdtree_destroi(arv->raiz);
 }
 
-//função de busca modificada para salvar os n-vizinho na heap
-void _kdtree_busca(tarv *arv, tnode **atual, void *key, int profund, theap *heap) {
-    if (*atual != NULL) {
-        double dist_atual = arv->dist((*atual)->key, key);
+//busca normal
+void _kdtree_busca(tarv *arv, tnode *atual, void *key, int profund, tnode **melhor_no, double *melhor_dist) {
+    if (atual == NULL) return;
 
-        // Cria o nó da heap com distância e ponteiro para o nó da árvore
-        nodeHeap item;
-        item.distancia = dist_atual;
-        item.node = *atual;
-
-
-        insere(heap, item);
-
-        int pos = profund % arv->k;
-        int comp = arv->cmp(key, (*atual)->key, pos);
-
-        tnode **lado_principal;
-        tnode **lado_oposto;
-
-        if (comp < 0) {
-            lado_principal = &((*atual)->esq);
-            lado_oposto = &((*atual)->dir);
-        } else {
-            lado_principal = &((*atual)->dir);
-            lado_oposto = &((*atual)->esq);
-        }
-
-        _kdtree_busca(arv, lado_principal, key, profund + 1, heap);
-
-        float diferenca = ((treg *)key)->embedding[pos] - ((treg *)(*atual)->key)->embedding[pos];
-        if ((diferenca * diferenca) < heap->lista[0].distancia || heap->tam < heap->capacidade) {
-            _kdtree_busca(arv, lado_oposto, key, profund + 1, heap);
-        }
-    }
-}
-
-void kdtree_busca(tarv *arv, treg *query, int N) {
-    theap *heap = construirHeap(N);
-
-    _kdtree_busca(arv, &(arv->raiz), query, 0, heap);
-
-    printf("\nTop %d vizinhos mais proximos:\n", N);
-    for (int i = 0; i < heap->tam; ++i) {
-        treg *vizinho = (treg *)(heap->lista[i].node);
-        printf("%d. %s (distancia: %.4f)\n", i + 1, vizinho->person_id, heap->lista[i].distancia);
+    double dist_atual = arv->dist(atual->key, key);
+    if (dist_atual < *melhor_dist) {
+        *melhor_dist = dist_atual;
+        *melhor_no = atual;
     }
 
-    liberar_heap(heap);
-}
+    int pos = profund % arv->k;
+    int comp = arv->cmp(key, atual->key, pos);
 
+    tnode *lado_principal = (comp < 0) ? atual->esq : atual->dir;
+    tnode *lado_oposto    = (comp < 0) ? atual->dir : atual->esq;
+
+    _kdtree_busca(arv, lado_principal, key, profund + 1, melhor_no, melhor_dist);
+
+    // Verifica se ainda pode haver algo mais próximo no outro lado
+    double diferenca = ((treg *)key)->embedding[pos] - ((treg *)atual->key)->embedding[pos];
+    if (fabs(diferenca) < *melhor_dist) {
+        _kdtree_busca(arv, lado_oposto, key, profund + 1, melhor_no, melhor_dist);
+    }
+}
 treg buscar_mais_proximo(tarv *arv, treg query) {
-    theap *heap = construirHeap(1);
-    _kdtree_busca(arv, &(arv->raiz), &query, 0, heap);
-    treg resultado = *((treg *)(heap->lista[0].node));
-    liberar_heap(heap);
-    return resultado;
+    tnode *melhor_no = NULL;
+    double melhor_dist = INFINITY;
+
+    _kdtree_busca(arv, arv->raiz, &query, 0, &melhor_no, &melhor_dist);
+
+    if (melhor_no != NULL)
+        return *((treg *)melhor_no->key);
+
+    treg vazio;
+    strcpy(vazio.person_id, "NAO_ENCONTRADO");
+    return vazio;
 }
+
+//BUSCA com a HEAP
+// void _kdtree_busca(tarv *arv, tnode **atual, void *key, int profund, theap *heap) {
+//     if (*atual == NULL) return;
+    
+//     //recebe o nô atual e calcula a distancia dos demais nôs
+//     double dist_atual = arv->dist((*atual)->key, key);
+
+//     // Insere na heap (max-heap) a distância já calculada
+//     nodeHeap item = { dist_atual, *atual };
+//      insere(heap, item);
+
+//     int pos = profund % arv->k;
+//     int comp = arv->cmp(key, (*atual)->key, pos);
+
+//     tnode **lado_principal = (comp < 0)
+//         ? &((*atual)->esq) 
+//         : &((*atual)->dir);
+//     tnode **lado_oposto = (comp < 0)
+//         ? &((*atual)->dir)
+//         : &((*atual)->esq);
+
+//     // Desce primeiro no ramo que parece m
+//     _kdtree_busca(arv, lado_principal, key, profund + 1, heap);
+    
+//     // Obtém a “pior” (maior) distância da heap cheia, ou INFINITY se ainda não estiver cheia
+//     double maxDist = (heap->tam == heap->capacidade)
+//         ? heap->lista[0].distancia
+//         : INFINITY;
+
+//     // Se a diferença absoluta na dimensão de corte for menor que maxDist,
+//     // ainda pode haver pontos melhores no ramo oposto
+//     double diferenca = ((treg *)key)->embedding[pos]
+//                      - ((treg *)(*atual)->key)->embedding[pos];
+//     if (fabs(diferenca) < maxDist) {
+//         _kdtree_busca(arv, lado_oposto, key, profund + 1, heap);
+//     }
+// }    
+
+// void kdtree_busca(tarv *arv, treg *query, int N) {
+//     theap *heap = construirHeap(N);
+
+//     _kdtree_busca(arv, &(arv->raiz), query, 0, heap);
+
+//     printf("\nTop %d vizinhos mais proximos:\n", N);
+//     for (int i = 0; i < heap->tam; ++i) {
+//         treg *vizinho = (treg *)(heap->lista[i].node);
+//         printf("%d. %s (distancia: %.4f)\n", i + 1, vizinho->person_id, heap->lista[i].distancia);
+//     }
+//     liberar_heap(heap);
+// }
+
+// treg buscar_mais_proximo(tarv *arv, treg query) {
+//     theap *heap = construirHeap(1);
+//     _kdtree_busca(arv, &(arv->raiz), &query, 0, heap);
+//     treg resultado = *((treg *)(heap->lista[0].node));
+//     liberar_heap(heap);
+//     return resultado;
+// }
 
 tarv arvore_global;
 
@@ -177,8 +215,3 @@ void kdtree_construir_global() {
     arvore_global.raiz = NULL;
 }
 
-
-int main(void) {
-
-    return EXIT_SUCCESS;
-}
