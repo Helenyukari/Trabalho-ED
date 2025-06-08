@@ -1,6 +1,21 @@
-
-
+!importante esta dentro da Pasta raiz
+#criação do ambiente virtual
+    python -m venv venv 
     .\venv\Scripts\Activate.ps1
 
+#instalação da bibliotecas e api
+    pip install FastApi
+    pip install typing
+    pip install pydantic
+    pip install requests
+    pip install uvicorn
+
+#ativar o servidor
     uvicorn app:app --reload
-    ngrok http 8000
+
+#para testar para inserção das embeddings, em outro terminal
+    python req.py
+OBS: ele ira adicionar os 100 primeiras pessoas
+
+#links gerados pelo fastApi
+    http://127.0.0.1:8000/docs
