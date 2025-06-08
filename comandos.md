@@ -1,0 +1,7 @@
+
+
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+    .\venv\Scripts\Activate.ps1
+
+    uvicorn app:app --reload
+    ngrok http 8000
