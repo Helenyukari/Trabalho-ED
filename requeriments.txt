@@ -1,4 +1,9 @@
 !importante esta dentro da Pasta raiz
+Caso precise compilar pelo LInux e necessario alterar o arquivo Dll do kdtree_wrapper,
+codigo da geração do arquivo compilado de c pra python:
+
+    gcc -shared -o libkdtree.so -fPIC kdtreee.c 
+
 #criação do ambiente virtual
     python -m venv venv 
     .\venv\Scripts\Activate.ps1
