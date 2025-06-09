@@ -80,7 +80,7 @@ Com a KD-Tree modificada e sua API funcionando:
 ---
 ### ❔ Como executar  👩‍💻:
  Os comandos necessarios para executar o projeto estão presentes no arquivo requeriments.txt e o arquivo do colab com o codigo de geração de embeddings em .json a partir de fotos.
- 
+ e a explicação do codigo está no drive [Acesse aqui a explicação do código](https://drive.google.com/drive/folders/1vdq9RYQ3o9fu1AoZ4gCLwqfCz7sgocn4?usp=drive_link)
 ---
 
 
